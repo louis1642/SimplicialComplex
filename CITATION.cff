@@ -1,0 +1,15 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: SimplicialComplex
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Luigi
+    family-names: Catello
+    email: lu.catello@studenti.unina.it
+repository-code: 'https://github.com/louis1642/SimplicialComplex/'
+license: GPL-3.0
