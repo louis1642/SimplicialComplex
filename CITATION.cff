@@ -12,4 +12,7 @@ authors:
     family-names: Catello
     email: lu.catello@studenti.unina.it
 repository-code: 'https://github.com/louis1642/SimplicialComplex/'
+abstract: >-
+  MATLAB class to store, manage, and graphically represent
+  simplicial complexes with hyperedge cardinality up to 3.
 license: GPL-3.0
