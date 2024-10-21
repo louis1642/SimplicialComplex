@@ -9,7 +9,7 @@ classdef SimplicialComplex < handle
         generate_all_to_all(obj)
         generate_k_nearest(obj, k1, k2)
         generate_scale_free(obj, N0, m_tri, s)
-        generate_erdos_renyi(obj, p1, varargin)
+        generate_erdos_renyi(obj, p, option)
         generate_linial_meshulam(obj, p)
         
         idx = circ_idx(obj, i)
