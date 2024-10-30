@@ -48,6 +48,7 @@ classdef SimplicialComplex < handle
         hAx = DrawGraph(obj, varargin)
         deg = NodeDegree(obj, node, d)
         edges = Get1Simplices(obj)
+        triangles = Get2Simplices(obj)
 
         % % Setter for A2
         % function set.A2(obj, value)
