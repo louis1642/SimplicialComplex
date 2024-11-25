@@ -40,16 +40,15 @@ end
 function edges = select_edges(obj, m_tri, s)
     edges = zeros(m_tri, 2);
     existingEdges = obj.Get1Simplices;
-    edgesIdxs = 1:size(existingEdges,1);
+    edgesIdxs = 1:size(existingEdges, 1);
 
-    
-    if (s == 0) % non preferential
+    if (s == 0) % non-preferential
         t = 1;
         while (t <= m_tri)
             if isscalar(edgesIdxs)
                 ed = edgesIdxs;
             else
-                ed = randsample(edgesIdxs,1);
+                ed = randsample(edgesIdxs, 1);
             end
             edgesIdxs(edgesIdxs == ed) = [];
             if (any(ismember(existingEdges(ed, :), edges)))
@@ -58,29 +57,72 @@ function edges = select_edges(obj, m_tri, s)
             edges(t, :) = existingEdges(ed, :);
             t = t + 1;
         end
-        
-    else        % preferential
-        % TODO
-        % number of triangles edge ij belongs to
-        TntriaEd = triu(obj.A2 .* (obj.A2^2));
-        % find the indices of edges forming triangles
-        [i, j] = find(TntriaEd > 0);
-        k = TntriaEd > 0;
-        % computing the cumulative probability distribution
-        plink = [i j TntriaEd(k)];
-        pcum = [0; cumsum((plink(:,3)) ./ sum(plink(:,3)))];
-        % apply inverse transform sampling
-        while (true)
-            r = rand(m_tri, 1);
-            d = pcum' - r;
-            temp = diff(sign(d),1,2);
-            [~, idx] = find(temp);
-            % plink(idx,1:2)
-            if (length(unique(plink(idx,1:2)))==2*m_tri)
-                edges(:,:) = plink(idx, 1:2);
-                break;
-            end
-        end
 
+    else % preferential
+        % Compute the triangle weights
+        TntriaEd = triu(obj.A2 .* (obj.A2^2));
+        [i, j] = find(TntriaEd > 0);
+        weights = TntriaEd(sub2ind(size(TntriaEd), i, j));
+
+        % Normalize weights to probabilities
+        probabilities = weights / sum(weights);
+
+        % Sample edges directly
+        sampledIndices = datasample(1:numel(weights), m_tri, 'Weights', probabilities, 'Replace', false);
+        edges = [i(sampledIndices), j(sampledIndices)];
+
+        % Verify edges are unique and non-adjacent
+        if size(unique(edges(:)), 1) ~= 2 * m_tri
+            error("Failed to select non-adjacent edges. Adjust parameters or logic.");
+        end
     end
 end
+
+
+% function edges = select_edges(obj, m_tri, s)
+%     edges = zeros(m_tri, 2);
+%     existingEdges = obj.Get1Simplices;
+%     edgesIdxs = 1:size(existingEdges,1);
+% 
+% 
+%     if (s == 0) % non preferential
+%         t = 1;
+%         while (t <= m_tri)
+%             if isscalar(edgesIdxs)
+%                 ed = edgesIdxs;
+%             else
+%                 ed = randsample(edgesIdxs,1);
+%             end
+%             edgesIdxs(edgesIdxs == ed) = [];
+%             if (any(ismember(existingEdges(ed, :), edges)))
+%                 continue;
+%             end
+%             edges(t, :) = existingEdges(ed, :);
+%             t = t + 1;
+%         end
+% 
+%     else        % preferential
+%         % TODO
+%         % number of triangles edge ij belongs to
+%         TntriaEd = triu(obj.A2 .* (obj.A2^2));
+%         % find the indices of edges forming triangles
+%         [i, j] = find(TntriaEd > 0);
+%         k = TntriaEd > 0;
+%         % computing the cumulative probability distribution
+%         plink = [i j TntriaEd(k)];
+%         pcum = [0; cumsum((plink(:,3)) ./ sum(plink(:,3)))];
+%         % apply inverse transform sampling
+%         while (true)
+%             r = rand(m_tri, 1);
+%             d = pcum' - r;
+%             temp = diff(sign(d),1,2);
+%             [~, idx] = find(temp);
+%             % plink(idx,1:2)
+%             if (length(unique(plink(idx,1:2)))==2*m_tri)
+%                 edges(:,:) = plink(idx, 1:2);
+%                 break;
+%             end
+%         end
+% 
+%     end
+% end
